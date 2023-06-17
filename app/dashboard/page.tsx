@@ -7,9 +7,5 @@ export const metadata: Metadata = {
 };
 
 export default async function DashboardPage() {
-  return (
-    <div className="w-full min-h-full flex items-center justify-center">
-      dashboard page
-    </div>
-  );
+  return <></>;
 }
