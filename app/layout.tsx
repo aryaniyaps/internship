@@ -3,6 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { APP_NAME } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { Inter as FontSans } from "next/font/google";
+import { Provider } from "react-wrap-balancer";
 import "./globals.css";
 
 const fontSans = FontSans({
@@ -24,7 +25,9 @@ export default function RootLayout({
     <html lang="en">
       <head />
       <body className={cn("font-sans antialiased", fontSans.variable)}>
-        <QueryProvider>{children}</QueryProvider>
+        <Provider>
+          <QueryProvider>{children}</QueryProvider>
+        </Provider>
         {/* toaster goes here */}
         <Toaster />
       </body>
