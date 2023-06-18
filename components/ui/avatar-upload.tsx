@@ -1,5 +1,6 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import * as React from "react";
+import { ImageCropper } from "./image-cropper";
 
 interface AvatarUploadProps
   extends React.DetailedHTMLProps<
@@ -15,6 +16,8 @@ export const AvatarUpload: React.FC<AvatarUploadProps> = ({
   ...rest
 }) => {
   const [preview, setPreview] = React.useState<string | null>(existingAvatar);
+  const [cropModalOpen, setCropModalOpen] = React.useState(false);
+  const [selectedImage, setSelectedImage] = React.useState<string | null>(null);
 
   const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0) {
@@ -25,11 +28,17 @@ export const AvatarUpload: React.FC<AvatarUploadProps> = ({
     // Create a blob URL representing the image file
     const fileUrl = URL.createObjectURL(e.target.files[0]);
 
-    setPreview(fileUrl);
+    // Do not set the preview directly, but open the cropping modal
+    setSelectedImage(fileUrl);
+    setCropModalOpen(true);
+  };
 
-    if (onChange) {
-      onChange(e);
-    }
+  const onCropComplete = (croppedImageBlob: Blob) => {
+    // Create a blob URL representing the cropped image
+    const croppedImageUrl = URL.createObjectURL(croppedImageBlob);
+
+    setPreview(croppedImageUrl);
+    setCropModalOpen(false);
   };
 
   return (
@@ -47,12 +56,12 @@ export const AvatarUpload: React.FC<AvatarUploadProps> = ({
             <AvatarImage src={preview} alt="@aryaniyaps" />
             <AvatarFallback>AI</AvatarFallback>
           </Avatar>
-          // <img
-          //   className="h-24 w-24 rounded-full mb-4"
-          //   src={preview}
-          //   alt="Avatar Preview"
-          // />
         )}
+        <ImageCropper
+          isOpen={cropModalOpen}
+          imageSrc={selectedImage!}
+          onCropComplete={onCropComplete}
+        />
       </label>
     </div>
   );
