@@ -4,7 +4,7 @@ import { Database } from "./database.types";
 async function getProfile(userId: string, supabase: SupabaseClient<Database>) {
   const result = await supabase
     .from("profiles")
-    .select("username")
+    .select("username, avatar_url")
     .eq("id", userId)
     .throwOnError()
     .single();

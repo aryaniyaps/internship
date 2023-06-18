@@ -11,7 +11,7 @@ export interface Database {
     Tables: {
       profiles: {
         Row: {
-          avatar_url: string | null;
+          avatar_url: string;
           id: string;
           updated_at: string | null;
           username: string;

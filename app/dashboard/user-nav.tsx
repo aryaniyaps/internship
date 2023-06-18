@@ -12,8 +12,8 @@ export function UserNav({ user }: { user: User }) {
     <>
       <Link href="/settings" className="flex items-center gap-4">
         <Avatar className="h-8 w-8">
-          <AvatarImage src="/avatars/01.png" alt="@shadcn" />
-          <AvatarFallback>SC</AvatarFallback>
+          <AvatarImage src="/avatars/01.png" alt="@aryaniyaps" />
+          <AvatarFallback>AI</AvatarFallback>
         </Avatar>
         <p className="text-sm font-semibold leading-none">
           {profile?.username}

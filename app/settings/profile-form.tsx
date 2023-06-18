@@ -2,6 +2,7 @@
 
 import * as React from "react";
 
+import { AvatarUpload } from "@/components/ui/avatar-upload";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -30,6 +31,7 @@ const profileSchema = z.object({
     .max(28, {
       message: "username cannot be longer than 28 characters",
     }),
+  avatar: z.optional(z.any()), // Assuming you have some way to validate files server-side
 });
 
 interface ProfileFormProps extends React.HTMLAttributes<HTMLFormElement> {
@@ -65,30 +67,47 @@ export function ProfileForm({ user, className, ...props }: ProfileFormProps) {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="gap-4 flex items-start"
+      >
         <FormField
           control={form.control}
-          name="username"
+          name="avatar"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>username</FormLabel>
               <FormControl>
-                <Input placeholder="shadcn" {...field} />
+                <AvatarUpload existingAvatar={profile!.avatar_url} {...field} />
               </FormControl>
-              <FormDescription>
-                this is your public display name
-              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
+        <div className="flex flex-col gap-4 w-6/12">
+          <FormField
+            control={form.control}
+            name="username"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>username</FormLabel>
+                <FormControl>
+                  <Input placeholder="shadcn" {...field} />
+                </FormControl>
+                <FormDescription>
+                  this is your public display name
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <Button
-          type="submit"
-          disabled={!form.formState.isDirty || form.formState.isSubmitting}
-        >
-          Update profile
-        </Button>
+          <Button
+            type="submit"
+            disabled={!form.formState.isDirty || form.formState.isSubmitting}
+          >
+            update profile
+          </Button>
+        </div>
       </form>
     </Form>
   );
