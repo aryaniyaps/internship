@@ -68,7 +68,7 @@ export function ProfileForm({ user, className, ...props }: ProfileFormProps) {
       // upload avatar here
       const { error, data } = await supabase.storage
         .from("avatars")
-        .upload(`${user.id}/avatar`, values.avatar);
+        .upload(user.id, values.avatar);
 
       if (error) {
         toast({
