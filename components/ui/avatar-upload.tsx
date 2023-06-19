@@ -40,6 +40,8 @@ export const AvatarUpload: React.FC<AvatarUploadProps> = ({
         setSelectedImage(reader.result as string)
       );
       reader.readAsDataURL(e.target.files[0]);
+      // clear the selected file
+      e.target.value = "";
       setIsOpen(true);
     }
   };
