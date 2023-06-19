@@ -14,10 +14,14 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Database } from "@/lib/database.types";
 import { useToast } from "@/lib/hooks/use-toast";
 import { useUpdateProfileMutation } from "@/lib/mutations/profile";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { User } from "@supabase/auth-helpers-nextjs";
+import {
+  User,
+  createClientComponentClient,
+} from "@supabase/auth-helpers-nextjs";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { useProfileQuery } from "../../lib/queries/profile";
@@ -31,7 +35,7 @@ const profileSchema = z.object({
     .max(28, {
       message: "username cannot be longer than 28 characters",
     }),
-  avatar: z.optional(z.any()), // Assuming you have some way to validate files server-side
+  avatar: z.optional(z.any()), // Assuming we have some way to validate files server-side
 });
 
 interface ProfileFormProps extends React.HTMLAttributes<HTMLFormElement> {
@@ -39,9 +43,15 @@ interface ProfileFormProps extends React.HTMLAttributes<HTMLFormElement> {
 }
 
 export function ProfileForm({ user, className, ...props }: ProfileFormProps) {
+  const supabase = createClientComponentClient<Database>();
+
   const { toast } = useToast();
 
   const { data: profile } = useProfileQuery(user.id);
+
+  const {
+    data: { publicUrl },
+  } = supabase.storage.from("avatars").getPublicUrl(profile!.avatar_url);
 
   const mutation = useUpdateProfileMutation();
 
@@ -53,10 +63,32 @@ export function ProfileForm({ user, className, ...props }: ProfileFormProps) {
   });
 
   async function onSubmit(values: z.infer<typeof profileSchema>) {
-    const result = await mutation.mutateAsync({
-      id: user.id,
-      username: values.username,
-    });
+    let result;
+    if (values.avatar) {
+      // upload avatar here
+      const { error, data } = await supabase.storage
+        .from("avatars")
+        .upload(`${user.id}/avatar`, values.avatar);
+
+      if (error) {
+        toast({
+          description: "couldn't upload avatar, please try again",
+          variant: "destructive",
+        });
+        console.error(error);
+      }
+
+      result = await mutation.mutateAsync({
+        id: user.id,
+        username: values.username,
+        avatar_url: data?.path,
+      });
+    } else {
+      result = await mutation.mutateAsync({
+        id: user.id,
+        username: values.username,
+      });
+    }
 
     form.reset({ username: result!.username });
 
@@ -74,13 +106,13 @@ export function ProfileForm({ user, className, ...props }: ProfileFormProps) {
         <FormField
           control={form.control}
           name="avatar"
-          render={({ field: { ref, ...field } }) => (
+          render={({ field: { onChange } }) => (
             <FormItem>
               <FormControl>
                 <AvatarUpload
-                  avatarURL={profile!.avatar_url}
-                  onAvatarChange={() => {}}
-                  {...field}
+                  avatarURL={publicUrl}
+                  onAvatarChange={onChange}
+                  disabled={form.formState.isSubmitting}
                 />
               </FormControl>
               <FormMessage />

@@ -6,7 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "./avatar";
 import { Button } from "./button";
 import { Dialog, DialogContent, DialogFooter } from "./dialog";
 
-interface AvatarUploadProps {
+interface AvatarUploadProps extends React.HTMLProps<HTMLInputElement> {
   avatarURL: string;
   onAvatarChange: (newAvatar: Blob) => void;
 }
@@ -14,6 +14,7 @@ interface AvatarUploadProps {
 export const AvatarUpload: React.FC<AvatarUploadProps> = ({
   avatarURL,
   onAvatarChange,
+  disabled,
 }) => {
   const [crop, setCrop] = React.useState<Crop>({
     x: 0,
@@ -24,7 +25,6 @@ export const AvatarUpload: React.FC<AvatarUploadProps> = ({
   });
   const [isOpen, setIsOpen] = React.useState(false);
   const [preview, setPreview] = React.useState(avatarURL);
-  const [completedCrop, setCompletedCrop] = React.useState<Crop | null>(null);
   const [selectedImage, setSelectedImage] = React.useState<string | null>(null);
 
   const imgRef = React.useRef<HTMLImageElement | null>(null);
@@ -47,7 +47,7 @@ export const AvatarUpload: React.FC<AvatarUploadProps> = ({
   };
 
   const onCropComplete = (crop: Crop) => {
-    setCompletedCrop(crop);
+    setCrop(crop);
   };
 
   const handleClose = () => {
@@ -55,9 +55,7 @@ export const AvatarUpload: React.FC<AvatarUploadProps> = ({
   };
 
   const handleSave = async () => {
-    if (completedCrop) {
-      await generateCrop(completedCrop);
-    }
+    await generateCrop(crop);
   };
 
   const generateCrop = async (crop: Crop) => {
@@ -110,6 +108,7 @@ export const AvatarUpload: React.FC<AvatarUploadProps> = ({
           type="file"
           className="hidden"
           onChange={onSelectFile}
+          disabled={disabled}
           accept="image/*"
         />
         <Avatar className="h-24 w-24">
