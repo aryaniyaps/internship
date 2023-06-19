@@ -1,3 +1,4 @@
+import Image from "next/image";
 import * as React from "react";
 import ReactCrop, { Crop } from "react-image-crop";
 import "react-image-crop/dist/ReactCrop.css";
@@ -14,7 +15,6 @@ export const AvatarUpload: React.FC<AvatarUploadProps> = ({
   avatarURL,
   onAvatarChange,
 }) => {
-  const [isOpen, setIsOpen] = React.useState(false);
   const [crop, setCrop] = React.useState<Crop>({
     x: 0,
     y: 0,
@@ -22,9 +22,12 @@ export const AvatarUpload: React.FC<AvatarUploadProps> = ({
     height: 100,
     unit: "px",
   });
-  const imgRef = React.useRef<HTMLImageElement | null>(null);
-  const [upImg, setUpImg] = React.useState(avatarURL);
+  const [isOpen, setIsOpen] = React.useState(false);
+  const [preview, setPreview] = React.useState(avatarURL);
   const [completedCrop, setCompletedCrop] = React.useState<Crop | null>(null);
+  const [selectedImage, setSelectedImage] = React.useState<string | null>(null);
+
+  const imgRef = React.useRef<HTMLImageElement | null>(null);
 
   const onImageLoad = (img: HTMLImageElement) => {
     imgRef.current = img;
@@ -33,7 +36,9 @@ export const AvatarUpload: React.FC<AvatarUploadProps> = ({
   const onSelectFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const reader = new FileReader();
-      reader.addEventListener("load", () => setUpImg(reader.result as string));
+      reader.addEventListener("load", () =>
+        setSelectedImage(reader.result as string)
+      );
       reader.readAsDataURL(e.target.files[0]);
       setIsOpen(true);
     }
@@ -41,7 +46,6 @@ export const AvatarUpload: React.FC<AvatarUploadProps> = ({
 
   const onCropComplete = (crop: Crop) => {
     setCompletedCrop(crop);
-    console.log("CROP COMPLETED");
   };
 
   const handleClose = () => {
@@ -58,6 +62,7 @@ export const AvatarUpload: React.FC<AvatarUploadProps> = ({
     if (imgRef.current && crop.width && crop.height) {
       const croppedImageBlob = await getCroppedImg(imgRef.current, crop);
       onAvatarChange(croppedImageBlob);
+      setPreview(URL.createObjectURL(croppedImageBlob));
       setIsOpen(false);
     }
   };
@@ -106,23 +111,33 @@ export const AvatarUpload: React.FC<AvatarUploadProps> = ({
           accept="image/*"
         />
         <Avatar className="h-24 w-24">
-          <AvatarImage src={upImg} alt="@aryaniyaps" />
+          <AvatarImage src={preview} alt="@aryaniyaps" />
           <AvatarFallback>AI</AvatarFallback>
         </Avatar>
       </label>
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent>
+        <DialogContent className="flex flex-col justify-center items-center gap-6">
           <ReactCrop
             aspect={1}
             crop={crop}
             onChange={(newCrop) => setCrop(newCrop)}
             onComplete={onCropComplete}
             ruleOfThirds
+            circularCrop
           >
-            <img src={upImg} ref={onImageLoad} />
+            {selectedImage && (
+              <Image
+                src={selectedImage}
+                ref={onImageLoad}
+                style={{ objectFit: "contain" }}
+                width={400}
+                height={400}
+                alt="selected image"
+              />
+            )}
           </ReactCrop>
-          <DialogFooter>
+          <DialogFooter className="flex gap-2 items-center">
             <Button onClick={handleSave}>Save</Button>
             <Button variant="outline" onClick={handleClose}>
               Cancel

@@ -27,16 +27,15 @@ interface SettingsLayoutProps {
 
 export default function SettingsLayout({ children }: SettingsLayoutProps) {
   return (
-    <div className="w-full min-h-screen space-y-6 p-8 pb-16">
-      <div className="flex max-w-7xl mx-auto">
+    <div className="w-full min-h-screen space-y-6 p-4 pb-16">
+      <div className="flex justify-between items-center max-w-7xl mx-auto">
         <h2 className="text-xl font-bold tracking-tight">
           {APP_NAME} settings
         </h2>
-        <div className="ml-auto flex items-center">
-          <Link href="/dashboard">
-            <Button variant="link">back to dashboard</Button>
-          </Link>
-        </div>
+
+        <Link href="/dashboard">
+          <Button variant="link">back to dashboard</Button>
+        </Link>
       </div>
       <Separator className="mt-6" />
       <div className="max-w-7xl mx-auto flex flex-col space-y-8 lg:flex-row lg:space-x-12 lg:space-y-0">
