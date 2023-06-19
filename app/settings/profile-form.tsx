@@ -74,10 +74,14 @@ export function ProfileForm({ user, className, ...props }: ProfileFormProps) {
         <FormField
           control={form.control}
           name="avatar"
-          render={({ field }) => (
+          render={({ field: { ref, ...field } }) => (
             <FormItem>
               <FormControl>
-                <AvatarUpload existingAvatar={profile!.avatar_url} {...field} />
+                <AvatarUpload
+                  avatarURL={profile!.avatar_url}
+                  onAvatarChange={() => {}}
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>

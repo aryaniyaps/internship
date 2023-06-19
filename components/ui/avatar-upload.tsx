@@ -1,68 +1,135 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import * as React from "react";
-import { ImageCropper } from "./image-cropper";
+import ReactCrop, { Crop } from "react-image-crop";
+import "react-image-crop/dist/ReactCrop.css";
+import { Avatar, AvatarFallback, AvatarImage } from "./avatar";
+import { Button } from "./button";
+import { Dialog, DialogContent, DialogFooter } from "./dialog";
 
-interface AvatarUploadProps
-  extends React.DetailedHTMLProps<
-    React.InputHTMLAttributes<HTMLInputElement>,
-    HTMLInputElement
-  > {
-  existingAvatar: string | null;
+interface AvatarUploadProps {
+  avatarURL: string;
+  onAvatarChange: (newAvatar: Blob) => void;
 }
 
 export const AvatarUpload: React.FC<AvatarUploadProps> = ({
-  existingAvatar,
-  onChange,
-  ...rest
+  avatarURL,
+  onAvatarChange,
 }) => {
-  const [preview, setPreview] = React.useState<string | null>(existingAvatar);
-  const [cropModalOpen, setCropModalOpen] = React.useState(false);
-  const [selectedImage, setSelectedImage] = React.useState<string | null>(null);
+  const [isOpen, setIsOpen] = React.useState(false);
+  const [crop, setCrop] = React.useState<Crop>({
+    x: 0,
+    y: 0,
+    width: 100,
+    height: 100,
+    unit: "px",
+  });
+  const imgRef = React.useRef<HTMLImageElement | null>(null);
+  const [upImg, setUpImg] = React.useState(avatarURL);
+  const [completedCrop, setCompletedCrop] = React.useState<Crop | null>(null);
 
-  const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files || e.target.files.length === 0) {
-      setPreview(existingAvatar);
-      return;
-    }
-
-    // Create a blob URL representing the image file
-    const fileUrl = URL.createObjectURL(e.target.files[0]);
-
-    // Do not set the preview directly, but open the cropping modal
-    setSelectedImage(fileUrl);
-    setCropModalOpen(true);
+  const onImageLoad = (img: HTMLImageElement) => {
+    imgRef.current = img;
   };
 
-  const onCropComplete = (croppedImageBlob: Blob) => {
-    // Create a blob URL representing the cropped image
-    const croppedImageUrl = URL.createObjectURL(croppedImageBlob);
+  const onSelectFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const reader = new FileReader();
+      reader.addEventListener("load", () => setUpImg(reader.result as string));
+      reader.readAsDataURL(e.target.files[0]);
+      setIsOpen(true);
+    }
+  };
 
-    setPreview(croppedImageUrl);
-    setCropModalOpen(false);
+  const onCropComplete = (crop: Crop) => {
+    setCompletedCrop(crop);
+    console.log("CROP COMPLETED");
+  };
+
+  const handleClose = () => {
+    setIsOpen(false);
+  };
+
+  const handleSave = async () => {
+    if (completedCrop) {
+      await generateCrop(completedCrop);
+    }
+  };
+
+  const generateCrop = async (crop: Crop) => {
+    if (imgRef.current && crop.width && crop.height) {
+      const croppedImageBlob = await getCroppedImg(imgRef.current, crop);
+      onAvatarChange(croppedImageBlob);
+      setIsOpen(false);
+    }
+  };
+
+  const getCroppedImg = (image: HTMLImageElement, crop: Crop) => {
+    const canvas = document.createElement("canvas");
+    const scaleX = image.naturalWidth / image.width;
+    const scaleY = image.naturalHeight / image.height;
+    canvas.width = crop.width;
+    canvas.height = crop.height;
+    const ctx = canvas.getContext("2d");
+
+    if (ctx) {
+      ctx.drawImage(
+        image,
+        crop.x * scaleX,
+        crop.y * scaleY,
+        crop.width * scaleX,
+        crop.height * scaleY,
+        0,
+        0,
+        crop.width,
+        crop.height
+      );
+    }
+
+    return new Promise<Blob>((resolve, reject) => {
+      canvas.toBlob((blob) => {
+        if (!blob) {
+          //reject(new Error('Canvas is empty'));
+          console.error("Canvas is empty");
+          return;
+        }
+        resolve(blob);
+      }, "image/jpeg");
+    });
   };
 
   return (
-    <div className="flex flex-col items-center">
+    <div>
       <label className="cursor-pointer">
         <input
           type="file"
           className="hidden"
-          onChange={onFileChange}
+          onChange={onSelectFile}
           accept="image/*"
-          {...rest}
         />
-        {preview && (
-          <Avatar className="h-24 w-24">
-            <AvatarImage src={preview} alt="@aryaniyaps" />
-            <AvatarFallback>AI</AvatarFallback>
-          </Avatar>
-        )}
-        <ImageCropper
-          isOpen={cropModalOpen}
-          imageSrc={selectedImage!}
-          onCropComplete={onCropComplete}
-        />
+        <Avatar className="h-24 w-24">
+          <AvatarImage src={upImg} alt="@aryaniyaps" />
+          <AvatarFallback>AI</AvatarFallback>
+        </Avatar>
       </label>
+
+      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        <DialogContent>
+          <ReactCrop
+            aspect={1}
+            crop={crop}
+            onChange={(newCrop) => setCrop(newCrop)}
+            onComplete={onCropComplete}
+            ruleOfThirds
+          >
+            <img src={upImg} ref={onImageLoad} />
+          </ReactCrop>
+          <DialogFooter>
+            <Button onClick={handleSave}>Save</Button>
+            <Button variant="outline" onClick={handleClose}>
+              Cancel
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

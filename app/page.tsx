@@ -17,7 +17,7 @@ export default async function LandingPage() {
 
   return (
     <div className="flex flex-col items-center justify-center w-full">
-      <section className="mb-32 text-center mx-auto">
+      <section className="flex flex-col justify-center items-center mb-32 text-center">
         <Balancer
           as="h2"
           className="max-w-lg mb-12 text-5xl font-bold tracking-tight md:text-6xl xl:text-7xl"
