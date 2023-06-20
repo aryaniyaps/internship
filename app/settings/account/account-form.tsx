@@ -13,14 +13,17 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Database } from "@/lib/database.types";
 import { useToast } from "@/lib/hooks/use-toast";
-import { useUpdateProfileMutation } from "@/lib/mutations/profile";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { User } from "@supabase/auth-helpers-nextjs";
+import {
+  User,
+  createClientComponentClient,
+} from "@supabase/auth-helpers-nextjs";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 
-const accountSchema = z.object({
+const userSchema = z.object({
   email: z
     .string({ required_error: "please enter your email" })
     .email({ message: "please enter a valid email" }),
@@ -33,24 +36,35 @@ interface AccountFormProps extends React.HTMLAttributes<HTMLFormElement> {
 export function AccountForm({ user, className, ...props }: AccountFormProps) {
   const { toast } = useToast();
 
-  const mutation = useUpdateProfileMutation();
+  const supabase = createClientComponentClient<Database>();
 
-  const form = useForm<z.infer<typeof accountSchema>>({
-    resolver: zodResolver(accountSchema),
+  const form = useForm<z.infer<typeof userSchema>>({
+    resolver: zodResolver(userSchema),
     defaultValues: {
       email: user.email,
     },
   });
 
-  async function onSubmit(values: z.infer<typeof accountSchema>) {
-    const result = await mutation.mutateAsync({
-      id: user.id,
-      username: values.email,
-    });
-    form.reset({ email: result!.username });
+  async function onSubmit(values: z.infer<typeof userSchema>) {
+    const { data, error } = await supabase.auth.updateUser(
+      { email: values.email },
+      { emailRedirectTo: `${location.origin}/email/change/` }
+    );
+
+    console.log(data.user);
+
+    form.reset({ email: user.email });
+
+    if (error) {
+      toast({
+        description: "unexpected error occured. Please try again",
+        variant: "destructive",
+      });
+      return;
+    }
 
     toast({
-      description: "your user account is updated!",
+      description: `we have sent a confirmation email to ${values.email}. Please follow instructions from there to change your email`,
     });
   }
 
