@@ -33,14 +33,12 @@ export default async function DashboardLayout({
 
   return (
     <div className="w-full min-h-screen flex flex-col">
-      <div className="border-b">
-        <div className="max-w-7xl mx-auto flex items-center p-4">
+      <div className="border-b p-4">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
           <h1 className="font-semibold">{APP_NAME}</h1>
-          <div className="ml-auto">
-            <Hydrate state={dehydratedState}>
-              <UserNav user={session!.user} />
-            </Hydrate>
-          </div>
+          <Hydrate state={dehydratedState}>
+            <UserNav user={session!.user} />
+          </Hydrate>
         </div>
       </div>
       <div className="max-w-7xl mx-auto p-4">{children}</div>
