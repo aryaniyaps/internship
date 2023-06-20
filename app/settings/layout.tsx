@@ -37,8 +37,8 @@ export default function SettingsLayout({ children }: SettingsLayoutProps) {
           </Link>
         </div>
       </div>
-      <div className="max-w-7xl mx-auto flex flex-col space-y-8 lg:flex-row lg:space-x-12 lg:space-y-0">
-        <aside className="-mx-4 lg:w-1/6">
+      <div className="p-4 max-w-7xl mx-auto flex flex-col space-y-8 lg:flex-row lg:space-x-12 lg:space-y-0">
+        <aside className="lg:w-1/6">
           <SidebarNav items={sidebarNavItems} />
         </aside>
         <div className="flex-1 lg:max-w-2xl">{children}</div>

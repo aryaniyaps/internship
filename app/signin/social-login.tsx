@@ -49,12 +49,20 @@ export function SocialLogin() {
       <Button
         variant="outline"
         onClick={async () => {
-          await supabase.auth.signInWithOAuth({
+          const { error } = await supabase.auth.signInWithOAuth({
             provider: "google",
+
             options: {
               redirectTo: `${location.origin}/auth/callback/`,
             },
           });
+
+          if (error) {
+            toast({
+              description: "unexpected error occured. Please try again",
+              variant: "destructive",
+            });
+          }
         }}
       >
         <Icons.google className="mr-2 h-4 w-4" /> Google

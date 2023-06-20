@@ -1,9 +1,8 @@
-import { AvatarFallback } from "@radix-ui/react-avatar";
 import Image from "next/image";
 import * as React from "react";
 import ReactCrop, { Crop } from "react-image-crop";
 import "react-image-crop/dist/ReactCrop.css";
-import { Avatar, AvatarImage } from "./avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "./avatar";
 import { Button } from "./button";
 import { Dialog, DialogContent, DialogFooter } from "./dialog";
 
@@ -106,10 +105,10 @@ export const AvatarUpload: React.FC<AvatarUploadProps> = ({
 
   return (
     <div>
-      <label className="cursor-pointer">
+      <label className="cursor-pointer w-full text-center">
         <input
           type="file"
-          className="hidden"
+          className="absolute hidden"
           onChange={onSelectFile}
           disabled={disabled}
           accept="image/png, image/jpeg"

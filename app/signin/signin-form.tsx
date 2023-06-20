@@ -41,13 +41,20 @@ export function SigninForm({ className, ...props }: SigninFormProps) {
   const supabase = createClientComponentClient();
 
   async function onSubmit(values: z.infer<typeof signinSchema>) {
-    await supabase.auth.signInWithOtp({
+    const { error } = await supabase.auth.signInWithOtp({
       email: values.email,
-
       options: {
         emailRedirectTo: `${location.origin}/auth/callback/`,
       },
     });
+
+    if (error) {
+      toast({
+        description: "unexpected error occured. Please try again",
+        variant: "destructive",
+      });
+      return;
+    }
     toast({
       title: "email link sent",
       description: "check your email for a sign in link!",

@@ -1,7 +1,18 @@
 import { Separator } from "@/components/ui/separator";
-import { SignOut } from "./signout";
+import { Database } from "@/lib/database.types";
+import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
+import { cookies } from "next/headers";
+import { AccountForm } from "./account-form";
 
 export default async function SettingsAccountPage() {
+  const supabase = createServerComponentClient<Database>({
+    cookies,
+  });
+
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+
   return (
     <div className="space-y-6">
       <div>
@@ -11,7 +22,7 @@ export default async function SettingsAccountPage() {
         </p>
       </div>
       <Separator />
-      <SignOut />
+      <AccountForm user={session!.user} />
     </div>
   );
 }
