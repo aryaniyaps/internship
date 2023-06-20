@@ -20,6 +20,7 @@ export default function CompleteEmailChangePage() {
       access_token: string,
       refresh_token: string
     ) {
+      // email is already changed at this point. we are just setting a new session here
       const { error } = await supabase.auth.setSession({
         access_token,
         refresh_token,
