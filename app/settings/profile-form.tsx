@@ -68,7 +68,7 @@ export function ProfileForm({ user, className, ...props }: ProfileFormProps) {
       // upload avatar here
       const { error, data } = await supabase.storage
         .from("avatars")
-        .upload(user.id, values.avatar);
+        .upload(user.id, values.avatar, { upsert: true });
 
       if (error) {
         toast({
@@ -102,6 +102,7 @@ export function ProfileForm({ user, className, ...props }: ProfileFormProps) {
       <form
         onSubmit={form.handleSubmit(onSubmit)}
         className="gap-4 flex items-start"
+        {...props}
       >
         <FormField
           control={form.control}
@@ -110,6 +111,7 @@ export function ProfileForm({ user, className, ...props }: ProfileFormProps) {
             <FormItem>
               <FormControl>
                 <AvatarUpload
+                  username={profile!.username}
                   avatarURL={publicUrl}
                   onAvatarChange={onChange}
                   disabled={form.formState.isSubmitting}

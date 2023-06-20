@@ -1,17 +1,20 @@
+import { AvatarFallback } from "@radix-ui/react-avatar";
 import Image from "next/image";
 import * as React from "react";
 import ReactCrop, { Crop } from "react-image-crop";
 import "react-image-crop/dist/ReactCrop.css";
-import { Avatar, AvatarFallback, AvatarImage } from "./avatar";
+import { Avatar, AvatarImage } from "./avatar";
 import { Button } from "./button";
 import { Dialog, DialogContent, DialogFooter } from "./dialog";
 
 interface AvatarUploadProps extends React.HTMLProps<HTMLInputElement> {
+  username: string;
   avatarURL: string;
   onAvatarChange: (newAvatar: Blob) => void;
 }
 
 export const AvatarUpload: React.FC<AvatarUploadProps> = ({
+  username,
   avatarURL,
   onAvatarChange,
   disabled,
@@ -109,11 +112,11 @@ export const AvatarUpload: React.FC<AvatarUploadProps> = ({
           className="hidden"
           onChange={onSelectFile}
           disabled={disabled}
-          accept="image/*"
+          accept="image/png, image/jpeg"
         />
         <Avatar className="h-24 w-24">
-          <AvatarImage src={preview} alt="@aryaniyaps" />
-          <AvatarFallback>AI</AvatarFallback>
+          <AvatarImage src={preview} loading="eager" alt={`@${username}`} />
+          <AvatarFallback>{username.slice(0, 2)}</AvatarFallback>
         </Avatar>
       </label>
 
@@ -131,7 +134,7 @@ export const AvatarUpload: React.FC<AvatarUploadProps> = ({
               <Image
                 src={selectedImage}
                 ref={onImageLoad}
-                style={{ objectFit: "contain" }}
+                className="w-auto h-auto object-contain"
                 width={400}
                 height={400}
                 alt="selected image"

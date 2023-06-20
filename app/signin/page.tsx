@@ -1,10 +1,9 @@
+import { APP_NAME } from "@/lib/constants";
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-
-import { APP_NAME } from "@/lib/constants";
 import { SigninForm } from "./signin-form";
 import { SocialLogin } from "./social-login";
 

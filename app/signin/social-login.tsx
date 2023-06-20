@@ -1,15 +1,38 @@
 "use client";
 
-import * as React from "react";
-
 import { Icons } from "@/components/icons";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/lib/hooks/use-toast";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { useRouter, useSearchParams } from "next/navigation";
+import React, { useEffect } from "react";
 
-interface SocialLoginProps extends React.HTMLAttributes<HTMLDivElement> {}
-
-export function SocialLogin({ className, ...props }: SocialLoginProps) {
+export function SocialLogin() {
   const supabase = createClientComponentClient();
+
+  const router = useRouter();
+
+  const searchParams = useSearchParams();
+
+  const { toast } = useToast();
+
+  const [error, setError] = React.useState<string | null>(null);
+
+  // Listen for changes in search params and set the error state
+  useEffect(() => {
+    setError(searchParams.get("error"));
+  }, [searchParams]);
+
+  // Listen for changes in error state and show a toast
+  useEffect(() => {
+    if (error) {
+      toast({
+        description: error,
+        variant: "destructive",
+      });
+      router.replace("/signin");
+    }
+  }, [error, toast, router]);
 
   return (
     <>
