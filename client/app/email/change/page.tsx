@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
 export default function CompleteEmailChangePage() {
-  // TODO: DELETE/ UPDATE EXISTING OAUTH CONNECTIONS ON EMAIL CHANGE
+  // TODO: DELETE EXISTING OAUTH CONNECTIONS FOR OLD EMAIL ON EMAIL CHANGE
   const router = useRouter();
   const searchParams = new URLSearchParams(location.hash.substring(1));
 
@@ -20,7 +20,6 @@ export default function CompleteEmailChangePage() {
       access_token: string,
       refresh_token: string
     ) {
-      // email is already changed at this point. we are just setting a new session here
       const { error } = await supabase.auth.setSession({
         access_token,
         refresh_token,
