@@ -2,7 +2,7 @@ repo_name: aryaniyaps/internship
 report_id: 9605d024aab03367f8c351412980387a
 version: 0.1
 repo_type: Public
-timestamp: '2024-01-20T08:12:53+00:00'
+timestamp: '2024-02-29T19:31:15+00:00'
 requested_by: aryaniyaps
 provider: github
 branch: main
@@ -64,7 +64,7 @@ tools:
   last_updated_by: Aryan Iyappan
   last_updated_on: 2023-06-17 16:40:18.000000000 Z
 - name: Next.js
-  description: 'A small framework for server-rendered universal JavaScript apps '
+  description: A small framework for server-rendered universal JavaScript apps
   website_url: https://nextjs.org/
   version: 13.4.6
   open_source: true
@@ -371,3 +371,15 @@ tools:
     detected_date: Mar 16
     severity: low
     first_patched: 2.2.6.4
+  - name: Rack vulnerable to ReDoS in content type parsing (2nd degree polynomial)
+    cve_id: CVE-2024-25126
+    cve_url: https://github.com/advisories/GHSA-22f2-v57c-j9cx
+    detected_date: Feb 29
+    severity: low
+    first_patched: 2.2.8.1
+  - name: Rack has possible DoS Vulnerability with Range Header
+    cve_id: CVE-2024-26141
+    cve_url: https://github.com/advisories/GHSA-xj5v-6v4g-jfw6
+    detected_date: Feb 29
+    severity: low
+    first_patched: 2.2.8.1
